@@ -32,6 +32,9 @@ Known Issue:
 - due to lacks information about the technical test requirement. i only tested on my end using react native simulator and had my DeviceID or Device token registered on this Backend.
 - You can use your own Device Token to make sure this whole system is worked. Please navigate to folder /fb/main.go line.45, change the token variable with working DeviceID token.
 
+Possible Issue:
+- due to security concern, github or any third party including firebase would not be able to publish any secrets to the public. whilst this repository are remain open to public. you can create your own firebase config and place in the project with the same name if possible.
+
 
 Current System Flows:
 1. once the /fcm/send (POST) API triggered, it will publish the rabbitmq to the queue and exchanges
