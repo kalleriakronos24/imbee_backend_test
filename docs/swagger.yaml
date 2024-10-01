@@ -1,0 +1,49 @@
+definitions:
+  dto.InsertFCM:
+    properties:
+      message:
+        type: string
+    required:
+    - message
+    type: object
+  dto.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      error: {}
+      kind:
+        type: string
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /fcm/send:
+    post:
+      consumes:
+      - application/json
+      description: To send FCM Message with RBMQ Queue and Exchanges
+      parameters:
+      - description: insert fcm
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.InsertFCM'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.Response'
+      summary: FCM
+      tags:
+      - FCM
+swagger: "2.0"

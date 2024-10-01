@@ -1,0 +1,81 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${DOCKER_ENVIRONMENT}
+    tty: true
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    volumes:
+      - .:/opt/app/api
+      - files-uploaded:/opt/app/files-uploaded
+      - database-backup:/opt/app/database-backup
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3009:8080"
+    depends_on:
+      - db
+      - rabbitmq
+    links:
+      - db
+      - rabbitmq
+    networks:
+      - internal
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - internal
+
+  adminer:
+    image: adminer:4.8.1-standalone
+    container_name: imbee-adminer
+    restart: unless-stopped
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "9001:8080"
+    networks:
+      - internal
+
+  db:
+    image: mysql:latest
+    container_name: imbee-db
+    restart: on-failure
+    environment:
+      - MYSQL_HOST=${DB_HOST}
+      - MYSQL_PORT=${DB_PORT}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    volumes:
+      - imbee-db:/data/conf.d:/etc/mysql/conf.d
+      - imbee-db:/data/logs:/logs
+      - imbee-db:/usr/local/var/mysql:/var/lib/mysql
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+volumes:
+  imbee-db:
+    driver: local
+  files-uploaded:
+    driver: local
+  database-backup:
+    driver: local
+  rabbitmq-data:
+    driver: local
